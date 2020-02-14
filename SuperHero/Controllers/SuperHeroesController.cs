@@ -4,12 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SuperHero.Data;
 
 namespace SuperHero.Controllers
 {
     public class SuperHeroesController : Controller
     {
-
+        private readonly ApplicationDbContext _context;
+        public SuperHeroesController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         // GET: SuperHeroes
         public ActionResult Index()
@@ -26,7 +31,8 @@ namespace SuperHero.Controllers
         // GET: SuperHeroes/Create
         public ActionResult Create()
         {
-            return View();
+            var superHeroes = _context.superHeroes.ToList();
+            return View(superHeroes);
         }
 
         // POST: SuperHeroes/Create

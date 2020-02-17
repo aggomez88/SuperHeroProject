@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SuperHero.Data;
+using SuperHero.Models;
 
 namespace SuperHero.Controllers
 {
     public class SuperHeroesController : Controller
     {
+        
         private readonly ApplicationDbContext _context;
         public SuperHeroesController(ApplicationDbContext context)
         {
@@ -19,55 +21,64 @@ namespace SuperHero.Controllers
         // GET: SuperHeroes
         public ActionResult Index()
         {
-            return View();
+            var superHeroes = _context.su.ToList();
+            return View(superHeroes);
         }
 
         // GET: SuperHeroes/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int Id)
         {
-            return View();
+            var heroInDB = _context.su.Where(c => c.Id == Id).Single();
+            return View(heroInDB);
         }
 
         // GET: SuperHeroes/Create
         public ActionResult Create()
         {
-            var superHeroes = _context.superHeroes.ToList();
-            return View(superHeroes);
+            SuperHeroModel superHero = new SuperHeroModel();
+            return View(superHero);
         }
-
-        // POST: SuperHeroes/Create
+        //POST SUPERHERO CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(SuperHeroModel newSuperHero)
         {
             try
             {
                 // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.su.Add(newSuperHero);
+                    _context.SaveChanges();
+                }
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(newSuperHero);
             }
         }
 
         // GET: SuperHeroes/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var hero = _context.su.Where(c => c.Id == id).Single();
+            return View(hero);
         }
 
         // POST: SuperHeroes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(SuperHeroModel superhero)
         {
             try
             {
                 // TODO: Add update logic here
+                var heroInDB = _context.su.Where(c => c.Id == superhero.Id).Single();
+                heroInDB.Name = superhero.Name;
 
-                return RedirectToAction(nameof(Index));
+                _context.SaveChanges();
+                return RedirectToAction("Index");
             }
             catch
             {
@@ -84,7 +95,7 @@ namespace SuperHero.Controllers
         // POST: SuperHeroes/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, SuperHeroModel collection)
         {
             try
             {

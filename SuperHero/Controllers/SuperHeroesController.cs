@@ -21,15 +21,18 @@ namespace SuperHero.Controllers
         // GET: SuperHeroes
         public ActionResult Index()
         {
-            var superHeroes = _context.su.ToList();
+            List<SuperHeroModel> superHeroes = _context.su.ToList();
             return View(superHeroes);
         }
 
         // GET: SuperHeroes/Details/5
-        public ActionResult Details(int Id)
+        public ActionResult Details()
         {
-            var heroInDB = _context.su.Where(c => c.Id == Id).Single();
-            return View(heroInDB);
+            //var superHeroes = _context.su.Where(s => s.Id == Id).FirstOrDefault();
+            //return View(superHeroes);
+
+            return RedirectToAction("Index");
+
         }
 
         // GET: SuperHeroes/Create
@@ -76,6 +79,10 @@ namespace SuperHero.Controllers
                 // TODO: Add update logic here
                 var heroInDB = _context.su.Where(c => c.Id == superhero.Id).Single();
                 heroInDB.Name = superhero.Name;
+                heroInDB.AlterEgo = superhero.AlterEgo;
+                heroInDB.PrimaryAbility = superhero.PrimaryAbility;
+                heroInDB.SecondaryAbility = superhero.SecondaryAbility;
+                heroInDB.CatchPhrase = superhero.CatchPhrase;
 
                 _context.SaveChanges();
                 return RedirectToAction("Index");
@@ -87,25 +94,28 @@ namespace SuperHero.Controllers
         }
 
         // GET: SuperHeroes/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int Id)
         {
-            return View();
+            SuperHeroModel superHero = _context.su.Find(Id);
+            return View(superHero);
+            
         }
 
         // POST: SuperHeroes/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, SuperHeroModel collection)
+        public ActionResult Delete(SuperHeroModel superHero)
         {
             try
             {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
+                // TODO: Add insert logic here
+                _context.su.Remove(superHero);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return RedirectToAction("Delete");
             }
         }
     }
